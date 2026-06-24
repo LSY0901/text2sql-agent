@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.firstaidemo.mapper.ColumnMetadataMapper">
+
+    <select id="selectAll" resultType="com.example.firstaidemo.models.entity.ColumnMetadata">
+        SELECT * FROM ai_column_metadata WHERE enabled = true
+        <if test="tableNames != null and tableNames.size() > 0">
+            AND table_name IN
+            <foreach collection="tableNames" item="table" open="(" separator="," close=")">
+                #{table}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectEnabledWithNullEmbedding" resultType="com.example.firstaidemo.models.entity.ColumnMetadata">
+        SELECT id, table_name, column_name, column_type, column_comment, business_meaning, value_examples
+        FROM agent.ai_column_metadata
+        WHERE embedding IS NULL AND enabled = true
+    </select>
+
+    <update id="updateEmbedding">
+        UPDATE agent.ai_column_metadata SET embedding = #{vector}::public.vector WHERE id = #{id}
+    </update>
+
+    <update id="resetAllEmbeddings">
+        UPDATE agent.ai_column_metadata SET embedding = NULL
+    </update>
+
+</mapper>

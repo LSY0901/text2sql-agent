@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.firstaidemo.mapper.TableMetadataMapper">
+
+    <select id="selectAll" resultType="com.example.firstaidemo.models.entity.TableMetadata">
+        SELECT * FROM agent.ai_table_metadata WHERE enabled = true
+    </select>
+
+    <select id="selectEnabledWithNullEmbedding" resultType="com.example.firstaidemo.models.entity.TableMetadata">
+        SELECT id, table_name, table_comment, business_domain, business_desc, table_alias
+        FROM agent.ai_table_metadata
+        WHERE embedding IS NULL AND enabled = true
+    </select>
+
+    <select id="selectByTableNames" resultType="com.example.firstaidemo.models.entity.TableMetadata">
+        SELECT table_name, table_comment, business_domain, business_desc
+        FROM agent.ai_table_metadata
+        WHERE table_name IN
+        <foreach collection="tableNames" item="t" open="(" separator="," close=")">
+            #{t}
+        </foreach>
+    </select>
+
+    <select id="selectVectorSearch" resultType="string">
+        SELECT table_name FROM agent.ai_table_metadata
+        WHERE enabled = true AND embedding IS NOT NULL
+        ORDER BY embedding &lt;=&gt; #{vector}::vector
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectEnabled" resultType="string">
+        SELECT table_name FROM agent.ai_table_metadata WHERE enabled = true
+    </select>
+
+    <update id="updateEmbedding">
+        UPDATE agent.ai_table_metadata SET embedding = #{vector}::public.vector WHERE id = #{id}
+    </update>
+
+    <update id="resetAllEmbeddings">
+        UPDATE agent.ai_table_metadata SET embedding = NULL
+    </update>
+
+</mapper>

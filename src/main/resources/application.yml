@@ -1,0 +1,60 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: firstAiDemo
+  datasource:
+    url: jdbc:postgresql://localhost:5432/agent_db?options=-c%20search_path%3Dagent%2Cpublic
+    username: agent_user
+    password: 123456
+  ai:
+    openai:
+
+#      base-url: http://localhost:11434
+#      api-key: 123456
+#      chat:
+#        options:
+#          model: Qwen3.5-9B-IQ4_NL.gguf
+
+#        base-url: https://api.deepseek.com
+#        api-key: sk-d6d0055bf4d451ab6a1a62cc8a945df
+#        chat:
+#          options:
+#            model: deepseek-v4-pro
+#            temperature: 0.2
+
+
+          base-url: https://dashscope.aliyuncs.com/compatible-mode
+          api-key: sk-ws-HRPHYXRY.wZxy.MEUCIQCpVBVy1CRj7UVwokFb1tzXI5JtoYx2P0mPRV_UUzIiqwIgaWWMsy4GZ2AzLUthT2lsjFyGS5b_hBv7clmGhFYzS6s
+          chat:
+            options:
+              model: qwen3.7-plus
+              temperature: 0.2
+
+
+embedding:
+  base-url: http://localhost:8082
+  model: bge-reranker-base
+
+
+rerank:
+  base-url: http://localhost:8083
+  model: bge-reranker-base
+
+logging:
+  level:
+    org.springframework.ai: debug
+    org.springframework.ai.openai: DEBUG
+    org.springframework.ai.chat.client.advisor: DEBUG
+
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    mapper-locations: classpath:/mapper/*.xml
+
+
+
+
+
