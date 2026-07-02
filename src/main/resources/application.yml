@@ -18,7 +18,7 @@ spring:
 #          model: Qwen3.5-9B-IQ4_NL.gguf
 
 #        base-url: https://api.deepseek.com
-#        api-key: sk-xxxxx
+#        api-key: sk-6d6d0055bf4d451ab6a1a62cc8a945df
 #        chat:
 #          options:
 #            model: deepseek-v4-pro
@@ -26,21 +26,21 @@ spring:
 
 
           base-url: https://dashscope.aliyuncs.com/compatible-mode
-          api-key: sk-xxx
+          api-key: sk-XXXX
           chat:
             options:
-              model: qwen3.7-plus
+              model: qwen3.7-max
               temperature: 0.2
 
 
 embedding:
   base-url: http://localhost:8082
-  model: bge-reranker-base
+  model: bge-m3
 
 
 rerank:
   base-url: http://localhost:8083
-  model: bge-reranker-base
+  model: bge-reranker-v2-m3
 
 logging:
   level:

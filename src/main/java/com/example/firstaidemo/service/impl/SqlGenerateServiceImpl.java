@@ -26,7 +26,7 @@ public class SqlGenerateServiceImpl implements ISqlGenerateService {
                   "type":"object",
                   "properties":{
                       "sql":{
-                          "type":"String"
+                          "type":"string"
                       }
                   },
                   "required":["sql"],

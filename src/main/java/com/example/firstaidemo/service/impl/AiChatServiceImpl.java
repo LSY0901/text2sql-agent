@@ -1,7 +1,6 @@
 package com.example.firstaidemo.service.impl;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.example.firstaidemo.mapper.ColumnMetadataMapper;
 import com.example.firstaidemo.mapper.TableMetadataMapper;
 import com.example.firstaidemo.models.entity.ColumnMetadata;
@@ -549,11 +548,11 @@ public class AiChatServiceImpl implements IAiChatService {
                 // 7. LLM 自然语言回答，流式输出
                 String answerPrompt = """
                         用户问题：%s
-
+                        
                         查询SQL：%s
-
+                        
                         查询结果：%s
-
+                        
                         请用自然语言回答用户的问题。
                         """
                         .formatted(question, generatedSqlByPlan, JSON.toJSONString(result));
@@ -612,12 +611,12 @@ public class AiChatServiceImpl implements IAiChatService {
                 log.info("** 第五阶段: 生成自然语言回答 **");
                 String answerPrompt = String.format("""
                                 用户问题：%s
-
+                                
                                 查询SQL：%s
-
+                                
                                 查询结果（JSON）：
                                 %s
-
+                                
                                 请用简洁的中文自然语言回答用户的问题。
                                 直接说结论，不要输出SQL，不要输出JSON，不要用Markdown格式。
                                 """,
@@ -658,15 +657,15 @@ public class AiChatServiceImpl implements IAiChatService {
         List<Message> messages = new ArrayList<>();
         messages.add(new SystemMessage("""
                 你是一个数据分析 Planner，负责理解用户意图并检索相关数据库表结构。
-
+                
                 ## 你的任务
-
+                
                 1. 调用 searchRelevantTables 向量搜索与用户问题最相关的表
                 2. 调用 loadColumnMetadata 获取这些表的列信息、类型、注释
                 3. 如果候选表太多，调用 rerankWithColumns 重排序，聚焦最相关的表
-
+                
                 ## 约束
-
+                
                 - 你只能使用以上三个工具：searchRelevantTables、loadColumnMetadata、rerankWithColumns
                 - 禁止编造表名、字段名、数据
                 - 获取到完整的列级 schema 后，不需要输出额外文字，系统会自动进入下一阶段
@@ -824,7 +823,9 @@ public class AiChatServiceImpl implements IAiChatService {
         throw new RuntimeException("SQL 执行失败，已重试 " + maxRetries + " 次。最后错误: " + lastError);
     }
 
-    /** 清理 Markdown 包裹、多余空白 */
+    /**
+     * 清理 Markdown 包裹、多余空白
+     */
     private String cleanSql(String raw) {
         if (raw == null) return "";
         String sql = raw.trim();
