@@ -36,10 +36,10 @@ public class OrderTool {
 
 
 
-    @Tool(description = "根据订单号查询订单信息")
-    public OrderEntity getOrderMessage(String orderNo) {
-        return orderService.getOrderByOrderNo(orderNo);
-    }
+//    @Tool(description = "根据订单号查询订单信息")
+//    public OrderEntity getOrderMessage(String orderNo) {
+//        return orderService.getOrderByOrderNo(orderNo);
+//    }
 
 
 }

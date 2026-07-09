@@ -26,11 +26,18 @@ spring:
 
 
           base-url: https://dashscope.aliyuncs.com/compatible-mode
-          api-key: sk-XXXX
+          api-key: sk-ws-H.RPHYXRY.wZxy.MEUCIQCpVBVy1CRj7UVwokFb1tzXI5JtoYx2P0mPRV_UUzIiqwIgaWWMsy4GZ2AzLUthT2lsjFyGS5b_hBv7clmGhFYzS6s
           chat:
             options:
               model: qwen3.7-max
               temperature: 0.2
+    mcp:
+      server:
+        name: text2sql-agent-server
+        version: 1.0.0
+        # 使用 SSE 传输（CatPaw 客户端连接 /sse 端点）
+        # Spring AI 1.1.8 + MCP SDK 0.18.3 支持协议 2025-11-25，兼容 CatPaw 的 2025-06-18
+        protocol: sse
 
 
 embedding:
