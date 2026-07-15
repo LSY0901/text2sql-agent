@@ -182,5 +182,13 @@ public class AiChatController {
         return aiChatService.text2SqlAgentTools(question);
     }
 
+    /**
+     * NLP2DSL2SQL Agent — 六阶段管线
+     * Schema 检索 → DSL 生成 → DSL 校验 → DSL 翻译SQL → Review+执行 → 自然语言回答
+     */
+    @GetMapping(value = "/nlp2Dsl2SqlAgent", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> nlp2Dsl2SqlAgent(String question) {
+        return aiChatService.nlp2Dsl2SqlAgent(question);
+    }
 
 }

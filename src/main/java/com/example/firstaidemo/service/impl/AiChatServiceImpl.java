@@ -7,6 +7,7 @@ import com.example.firstaidemo.models.entity.ColumnMetadata;
 import com.example.firstaidemo.models.entity.ReviewResult;
 import com.example.firstaidemo.models.entity.TableMetadata;
 import com.example.firstaidemo.service.IAiChatService;
+import com.example.firstaidemo.service.IDslAgentService;
 import com.example.firstaidemo.service.IText2SqlAgentService;
 import com.example.firstaidemo.tools.*;
 import jakarta.annotation.PostConstruct;
@@ -78,6 +79,8 @@ public class AiChatServiceImpl implements IAiChatService {
     private ToolCallback[] columnRerankTools;
 
     private final IText2SqlAgentService text2SqlAgentService;
+
+    private final IDslAgentService dslAgentService;
 
     @Value("${openai.embedding.dimension:1024}")
     private int embeddingDimension;
@@ -563,5 +566,9 @@ public class AiChatServiceImpl implements IAiChatService {
         return text2SqlAgentService.executeStream(question);
     }
 
+    @Override
+    public Flux<String> nlp2Dsl2SqlAgent(String question) {
+        return dslAgentService.executeStream(question);
+    }
 
 }

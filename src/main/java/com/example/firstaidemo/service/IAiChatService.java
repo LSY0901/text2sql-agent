@@ -111,4 +111,12 @@ public interface IAiChatService {
      * @return 流式 SSE 响应
      */
     Flux<String> text2SqlAgentTools(String question);
+
+    /**
+     * NLP2DSL2SQL Agent — 六阶段管线
+     * Schema 检索 → DSL 生成 → DSL 校验 → DSL 翻译SQL → Review+执行 → 自然语言回答
+     * @param question 用户自然语言问题
+     * @return 流式 SSE 响应
+     */
+    Flux<String> nlp2Dsl2SqlAgent(String question);
 }
