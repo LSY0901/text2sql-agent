@@ -1,9 +1,11 @@
 package com.example.firstaidemo.semanticdsl.agent;
 
+import com.alibaba.fastjson2.JSON;
 import com.example.firstaidemo.semanticdsl.enricher.SemanticDslEnricher;
-import com.example.firstaidemo.semanticdsl.metadata.IDslMetaDataService;
-import com.example.firstaidemo.semanticdsl.metadata.entity.*;
-import com.example.firstaidemo.semanticdsl.model.*;
+import com.example.firstaidemo.semanticdsl.model.DslCandidate;
+import com.example.firstaidemo.semanticdsl.model.EnrichedQueryDSL;
+import com.example.firstaidemo.semanticdsl.model.IntentResult;
+import com.example.firstaidemo.semanticdsl.model.SemanticQueryDSL;
 import com.example.firstaidemo.semanticdsl.prompt.SemanticPromptTemplates;
 import com.example.firstaidemo.semanticdsl.retriever.DslRetriever;
 import com.example.firstaidemo.semanticdsl.translator.DslTranslator;
@@ -16,8 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -25,7 +29,6 @@ import java.util.*;
 public class SemanticDslAgentServiceImpl implements ISemanticDslAgentService {
 
     private final ChatModel chatModel;
-    private final IDslMetaDataService metaDataService;
     private final DslRetriever dslRetriever;
     private final SemanticDslEnricher dslEnricher;
     private final SemanticDslValidator dslValidator;
@@ -35,69 +38,79 @@ public class SemanticDslAgentServiceImpl implements ISemanticDslAgentService {
     private final ObjectMapper objectMapper;
 
     @Override
-    public Map<String, Object> nlp2Dsl2SqlAgentV2(String question) {
-        log.info("━━━━━━━ NLP2DSL2SQL Agent V2 启动 ━━━━━━━");
-        log.info("用户问题: {}", question);
-        Map<String, Object> result = new LinkedHashMap<>();
+    public Flux<String> nlp2Dsl2SqlAgentV2(String question) {
+        return Flux.defer(() -> {
+            try {
+                log.info("━━━━━━━ NLP2DSL2SQL Agent V2 启动 ━━━━━━━");
+                log.info("用户问题: {}", question);
 
-        try {
-            // Stage 1: 意图识别
-            IntentResult intent = classifyIntent(question);
-            result.put("intent", intent);
-            log.info("[Stage 1] 意图识别: {} (confidence={})", intent.getIntent(), intent.getConfidence());
+                // Stage 1: 意图识别
+                IntentResult intent = classifyIntent(question);
+                log.info("[Stage 1] 意图识别: {} (confidence={})", intent.getIntent(), intent.getConfidence());
 
-            if ("NON_BUSINESS".equals(intent.getIntent())) {
-                result.put("answer", "非业务问题，无法处理。");
-                return result;
+                if ("NON_BUSINESS".equals(intent.getIntent())) {
+                    return Flux.just("非业务问题，无法处理。原因: " + intent.getReason());
+                }
+
+                // Stage 2: 语义检索
+                DslCandidate candidate = dslRetriever.retrieve(question);
+                log.info("[Stage 2] 语义检索完成: metrics={}, dimensions={}",
+                        candidate.getMetrics().size(), candidate.getDimensions().size());
+
+                // Stage 3: 语义DSL生成
+                SemanticQueryDSL semanticDSL = generateSemanticDSL(question, candidate);
+                log.info("[Stage 3] 语义DSL: {}", objectMapper.writeValueAsString(semanticDSL));
+
+                // Stage 4: DSL校验
+                IntentResult.IntentType intentType = IntentResult.IntentType.valueOf(intent.getIntent());
+                SemanticDslValidator.ValidationResult validation = dslValidator.validate(semanticDSL, intentType);
+                log.info("[Stage 4] 校验结果: valid={}", validation.valid());
+
+                if (!validation.valid()) {
+                    return Flux.just("DSL校验失败: " + validation.errors());
+                }
+
+                // Stage 5: DSL富化
+                EnrichedQueryDSL enrichedDSL = dslEnricher.enrich(semanticDSL, candidate);
+                log.info("[Stage 5] DSL富化完成");
+
+                // Stage 6: SQL生成
+                String sql = dslTranslator.translate(enrichedDSL);
+                log.info("[Stage 6] SQL生成: {}", sql);
+
+                // Stage 7: SQL审查 (带重试)
+                String finalSql = enforceReviewGate(sql, question, 3);
+                log.info("[Stage 7] SQL审查完成: {}", finalSql);
+
+                // 执行SQL
+                List<Map<String, Object>> queryResult = sqlExecuteTool.executeSql(finalSql);
+                log.info("━━━━━━━ NLP2DSL2SQL Agent V2 管线完成，开始流式回答 ━━━━━━━");
+
+                // Stage 8: LLM 自然语言回答，流式输出
+                String answerPrompt = """
+                        用户问题：%s
+
+                        查询SQL：%s
+
+                        查询结果：%s
+
+                        请用自然语言回答用户的问题。
+                        """.formatted(question, finalSql, JSON.toJSONString(queryResult));
+
+                return Flux.concat(
+                        Flux.just("【意图】" + intent.getIntent() + "\n"),
+                        Flux.just("【SQL】" + finalSql + "\n\n"),
+                        ChatClient.builder(chatModel).build()
+                                .prompt(answerPrompt)
+                                .stream()
+                                .content()
+                );
+
+            } catch (Exception e) {
+                log.error("Agent执行失败", e);
+                return Flux.just("错误: " + e.getMessage());
             }
-
-            // Stage 2: 语义检索
-            DslCandidate candidate = dslRetriever.retrieve(question);
-            result.put("retrievedCandidate", candidate);
-            log.info("[Stage 2] 语义检索完成");
-
-            // Stage 3: 语义DSL生成
-            SemanticQueryDSL semanticDSL = generateSemanticDSL(question, candidate);
-            result.put("semanticDSL", semanticDSL);
-            log.info("[Stage 3] 语义DSL: {}", objectMapper.writeValueAsString(semanticDSL));
-
-            // Stage 4: DSL校验
-            IntentResult.IntentType intentType = IntentResult.IntentType.valueOf(intent.getIntent());
-            SemanticDslValidator.ValidationResult validation = dslValidator.validate(semanticDSL, intentType);
-            result.put("validation", validation);
-            log.info("[Stage 4] 校验结果: valid={}", validation.valid());
-
-            if (!validation.valid()) {
-                result.put("answer", "DSL校验失败: " + validation.errors());
-                return result;
-            }
-
-            // Stage 5: DSL富化
-            EnrichedQueryDSL enrichedDSL = dslEnricher.enrich(semanticDSL, candidate);
-            result.put("enrichedDSL", enrichedDSL);
-            log.info("[Stage 5] DSL富化完成");
-
-            // Stage 6: SQL生成
-            String sql = dslTranslator.translate(enrichedDSL);
-            result.put("sql", sql);
-            log.info("[Stage 6] SQL生成: {}", sql);
-
-            // Stage 7: SQL审查 (带重试)
-            String finalSql = enforceReviewGate(sql, question, 3);
-            result.put("finalSql", finalSql);
-            log.info("[Stage 7] SQL审查完成: {}", finalSql);
-
-            // 执行SQL
-            Object queryResult = sqlExecuteTool.executeSql(finalSql);
-            result.put("data", queryResult);
-            log.info("━━━━━━━ NLP2DSL2SQL Agent V2 完成 ━━━━━━━");
-
-        } catch (Exception e) {
-            log.error("Agent执行失败", e);
-            result.put("error", e.getMessage());
-        }
-
-        return result;
+        });
     }
 
     @Override

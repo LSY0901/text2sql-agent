@@ -196,12 +196,12 @@ public class AiChatController {
     }
 
     /**
-     * NLP2DSL2SQL Agent V2 — 语义层管线
-     * 意图识别 → 向量检索+Rerank → DSL生成 → DSL校验 → DSL富化 → SQL翻译 → SQL审查+执行
+     * NLP2DSL2SQL Agent V2 — 语义层管线（流式）
+     * 意图识别 → 向量检索+Rerank → DSL生成 → DSL校验 → DSL富化 → SQL翻译 → SQL审查+执行 → 自然语言回答
      */
-    @GetMapping("/nlp2Dsl2SqlAgentV2")
-    public String nlp2Dsl2SqlAgentV2(String question) {
-        return com.alibaba.fastjson2.JSON.toJSONString(semanticDslAgentService.nlp2Dsl2SqlAgentV2(question));
+    @GetMapping(value = "/nlp2Dsl2SqlAgentV2", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> nlp2Dsl2SqlAgentV2(String question) {
+        return semanticDslAgentService.nlp2Dsl2SqlAgentV2(question);
     }
 
 }

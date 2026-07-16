@@ -1,21 +1,22 @@
 package com.example.firstaidemo.semanticdsl.enricher;
 
-import com.example.firstaidemo.semanticdsl.metadata.IDslMetaDataService;
 import com.example.firstaidemo.semanticdsl.metadata.entity.*;
-import com.example.firstaidemo.semanticdsl.model.*;
+import com.example.firstaidemo.semanticdsl.model.DslCandidate;
+import com.example.firstaidemo.semanticdsl.model.EnrichedQueryDSL;
+import com.example.firstaidemo.semanticdsl.model.SemanticFilter;
+import com.example.firstaidemo.semanticdsl.model.SemanticQueryDSL;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class SemanticDslEnricher {
 
-    private final IDslMetaDataService metaDataService;
 
     public EnrichedQueryDSL enrich(SemanticQueryDSL semanticDSL, DslCandidate candidate) {
         log.info("━━━ DSL Enricher 启动 ━━━");
@@ -121,7 +122,7 @@ public class SemanticDslEnricher {
     }
 
     private void addJoinForEntity(String entityCode, DslCandidate candidate, DslEntity mainEntity,
-                                   List<EnrichedQueryDSL.EnrichedJoin> joins) {
+                                  List<EnrichedQueryDSL.EnrichedJoin> joins) {
         DslRelation relation = candidate.getRelations().stream()
                 .filter(r -> (r.getSourceEntity().equals(mainEntity.getEntityCode()) && r.getTargetEntity().equals(entityCode))
                         || (r.getTargetEntity().equals(mainEntity.getEntityCode()) && r.getSourceEntity().equals(entityCode)))
