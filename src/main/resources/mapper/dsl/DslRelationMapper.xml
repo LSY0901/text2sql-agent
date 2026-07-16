@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.firstaidemo.mapper.dsl.DslRelationMapper">
+    <select id="selectAll" resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslRelation">
+        SELECT id, source_entity, target_entity, join_type, join_condition, relation_type, description,
+               is_deleted, creator, created_dt, last_editor, last_edited_dt
+        FROM agent.dsl_relation WHERE is_deleted = false
+    </select>
+    <select id="selectByEntity" resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslRelation">
+        SELECT id, source_entity, target_entity, join_type, join_condition, relation_type, description,
+               is_deleted, creator, created_dt, last_editor, last_edited_dt
+        FROM agent.dsl_relation WHERE is_deleted = false AND (source_entity = #{entityCode} OR target_entity = #{entityCode})
+    </select>
+</mapper>

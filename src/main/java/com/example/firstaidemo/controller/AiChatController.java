@@ -1,5 +1,6 @@
 package com.example.firstaidemo.controller;
 
+import com.example.firstaidemo.semanticdsl.agent.ISemanticDslAgentService;
 import com.example.firstaidemo.service.IAgentService;
 import com.example.firstaidemo.service.IAiChatService;
 import com.example.firstaidemo.service.IEnterpriseText2SqlService;
@@ -26,6 +27,9 @@ public class AiChatController {
 
     @Autowired
     private EmbeddingModel embeddingModel;
+
+    @Autowired
+    private ISemanticDslAgentService semanticDslAgentService;
 
     @GetMapping("/chat")
     public String chat(String message) {
@@ -189,6 +193,15 @@ public class AiChatController {
     @GetMapping(value = "/nlp2Dsl2SqlAgent", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> nlp2Dsl2SqlAgent(String question) {
         return aiChatService.nlp2Dsl2SqlAgent(question);
+    }
+
+    /**
+     * NLP2DSL2SQL Agent V2 — 语义层管线
+     * 意图识别 → 向量检索+Rerank → DSL生成 → DSL校验 → DSL富化 → SQL翻译 → SQL审查+执行
+     */
+    @GetMapping("/nlp2Dsl2SqlAgentV2")
+    public String nlp2Dsl2SqlAgentV2(String question) {
+        return com.alibaba.fastjson2.JSON.toJSONString(semanticDslAgentService.nlp2Dsl2SqlAgentV2(question));
     }
 
 }
