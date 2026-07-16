@@ -25,4 +25,7 @@ public interface IDslMetaDataService {
     List<String> searchMetricsByVector(String vectorStr, int limit);
     List<String> searchDimensionsByVector(String vectorStr, int limit);
     List<String> searchSynonymsByVector(String vectorStr, int limit);
+
+    /** 向量召回完整同义词（含 object_type / object_code） */
+    List<DslSynonym> searchSynonymRowsByVector(String vectorStr, int limit);
 }

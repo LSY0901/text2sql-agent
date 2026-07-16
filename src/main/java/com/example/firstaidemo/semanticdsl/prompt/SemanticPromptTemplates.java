@@ -38,24 +38,40 @@ public final class SemanticPromptTemplates {
             """;
 
     public static final String DSL_GENERATION_SYSTEM_PROMPT = """
-            你是一个语义DSL生成专家。根据用户问题生成结构化的语义查询DSL。
+            你是一个语义DSL生成专家。根据用户问题、意图类型和候选元数据生成结构化语义查询DSL。
             
-            DSL格式：
+            DSL格式（只返回JSON，不要解释）：
             {
               "metric": "指标code",
               "entity": "实体code",
-              "dimensions": ["维度code1", "维度code2"],
+              "dimensions": ["维度code1"],
               "filters": [
                 {"dimension": "维度code", "value": "维度值code"}
               ]
             }
             
             规则：
-            1. metric必须从候选指标中选择
-            2. entity必须与指标关联的实体一致
-            3. dimensions必须从候选维度中选择，且与指标兼容
-            4. filters中的dimension必须是有效维度，value必须是该维度的合法值
-            5. 如果用户问题不涉及指标查询，metric设为null
+            1. metric/entity/dimensions/filters 必须从候选元数据中选择，禁止编造
+            2. entity必须与所选metric所属实体一致
+            3. 意图为 METRIC_QUERY / DIMENSION_ANALYSIS 时，metric 必填，禁止为 null
+            4. 意图为 DIMENSION_ANALYSIS（对比/按维度分析）时：
+               - metric 必填（如总成绩用 sum_score，平均分用 avg_score）
+               - dimensions 必填（按哪个维度对比，如年级用 grade）
+               - 若只对比部分维度值（如一年级和四年级），filters 里写多个同维度条件
+            5. 「有多少/几个/数量/人数」类问题选数量指标（如 student_count）
+            6. 「总成绩/总分」选 sum_score；「平均分」选 avg_score
+            7. 若有同义词提示，优先按其指向选择
+            8. 候选中存在可回答指标时，禁止把 metric/entity 设为 null
+            
+            示例：
+            问题「有多少学生」→
+            {"metric":"student_count","entity":"student","dimensions":[],"filters":[]}
+            
+            问题「四年级有多少学生」→
+            {"metric":"student_count","entity":"student","dimensions":[],"filters":[{"dimension":"grade","value":"grade_4"}]}
+            
+            问题「一年级总成绩和四年级总成绩的对比」意图=DIMENSION_ANALYSIS →
+            {"metric":"sum_score","entity":"score","dimensions":["grade"],"filters":[{"dimension":"grade","value":"grade_1"},{"dimension":"grade","value":"grade_4"}]}
             """;
 
     public static final String DSL_ENRICHMENT_SYSTEM_PROMPT = """

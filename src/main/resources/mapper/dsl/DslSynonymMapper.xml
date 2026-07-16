@@ -17,4 +17,27 @@
         ORDER BY embedding &lt;=&gt; #{vector}::vector
         LIMIT #{limit}
     </select>
+
+    <!-- 返回完整同义词行，便于按 object_type 扩展候选 -->
+    <select id="selectVectorSearchRows"
+            resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslSynonym">
+        SELECT id, synonym_text, object_type, object_code, standard_name, description
+        FROM agent.dsl_synonym
+        WHERE is_deleted = false AND embedding IS NOT NULL
+        ORDER BY embedding &lt;=&gt; #{vector}::vector
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectWithNullEmbedding"
+            resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslSynonym">
+        SELECT id, synonym_text, standard_name, description
+        FROM agent.dsl_synonym
+        WHERE is_deleted = false AND embedding IS NULL
+    </select>
+
+    <update id="updateEmbedding">
+        UPDATE agent.dsl_synonym
+        SET embedding = #{vector}::public.vector
+        WHERE id = #{id}
+    </update>
 </mapper>

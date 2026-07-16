@@ -13,6 +13,8 @@ public class DslAttribute {
     private String physicalColumn;
     private String dataType;
     private String description;
+    /** JOIN dsl_entity 得到，仅用于 embedding 文本拼接 */
+    private String entityName;
     private Boolean isDeleted;
     private String creator;
     private Long createdDt;

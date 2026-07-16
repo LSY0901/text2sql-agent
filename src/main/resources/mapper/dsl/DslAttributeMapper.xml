@@ -12,4 +12,19 @@
         FROM agent.dsl_attribute WHERE is_deleted = false AND entity_code IN
         <foreach collection="list" item="code" open="(" separator="," close=")">#{code}</foreach>
     </select>
+
+    <select id="selectWithNullEmbedding"
+            resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslAttribute">
+        SELECT a.id, a.attribute_name, a.description, e.entity_name AS entity_name
+        FROM agent.dsl_attribute a
+        LEFT JOIN agent.dsl_entity e
+            ON a.entity_code = e.entity_code AND e.is_deleted = false
+        WHERE a.is_deleted = false AND a.embedding IS NULL
+    </select>
+
+    <update id="updateEmbedding">
+        UPDATE agent.dsl_attribute
+        SET embedding = #{vector}::public.vector
+        WHERE id = #{id}
+    </update>
 </mapper>

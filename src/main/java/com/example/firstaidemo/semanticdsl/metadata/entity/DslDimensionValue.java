@@ -12,6 +12,8 @@ public class DslDimensionValue {
     private String valueName;
     private String physicalValue;
     private String description;
+    /** JOIN dsl_dimension 得到，仅用于 embedding 文本拼接 */
+    private String dimensionName;
     private Boolean isDeleted;
     private String creator;
     private Long createdDt;

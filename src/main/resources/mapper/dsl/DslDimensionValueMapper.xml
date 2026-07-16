@@ -12,4 +12,19 @@
         FROM agent.dsl_dimension_value WHERE is_deleted = false AND dimension_code IN
         <foreach collection="dimensionCodes" item="code" open="(" separator="," close=")">#{code}</foreach>
     </select>
+
+    <select id="selectWithNullEmbedding"
+            resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslDimensionValue">
+        SELECT v.id, v.value_name, v.description, d.dimension_name AS dimension_name
+        FROM agent.dsl_dimension_value v
+        LEFT JOIN agent.dsl_dimension d
+            ON v.dimension_code = d.dimension_code AND d.is_deleted = false
+        WHERE v.is_deleted = false AND v.embedding IS NULL
+    </select>
+
+    <update id="updateEmbedding">
+        UPDATE agent.dsl_dimension_value
+        SET embedding = #{vector}::public.vector
+        WHERE id = #{id}
+    </update>
 </mapper>

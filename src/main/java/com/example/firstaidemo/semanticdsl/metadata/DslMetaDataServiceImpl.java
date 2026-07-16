@@ -43,4 +43,7 @@ public class DslMetaDataServiceImpl implements IDslMetaDataService {
     @Override public List<String> searchMetricsByVector(String v, int l) { return dslMetricMapper.selectVectorSearch(v, l); }
     @Override public List<String> searchDimensionsByVector(String v, int l) { return dslDimensionMapper.selectVectorSearch(v, l); }
     @Override public List<String> searchSynonymsByVector(String v, int l) { return dslSynonymMapper.selectVectorSearch(v, l); }
+    @Override public List<DslSynonym> searchSynonymRowsByVector(String v, int l) {
+        return dslSynonymMapper.selectVectorSearchRows(v, l);
+    }
 }

@@ -1,5 +1,6 @@
 package com.example.firstaidemo.controller;
 
+import com.example.firstaidemo.models.request.Nlp2DslAgentRequest;
 import com.example.firstaidemo.semanticdsl.agent.ISemanticDslAgentService;
 import com.example.firstaidemo.service.IAgentService;
 import com.example.firstaidemo.service.IAiChatService;
@@ -198,10 +199,13 @@ public class AiChatController {
     /**
      * NLP2DSL2SQL Agent V2 — 语义层管线（流式）
      * 意图识别 → 向量检索+Rerank → DSL生成 → DSL校验 → DSL富化 → SQL翻译 → SQL审查+执行 → 自然语言回答
+     *
+     * @param request 请求入参（question）
+     * @return SSE 文本流
      */
     @GetMapping(value = "/nlp2Dsl2SqlAgentV2", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> nlp2Dsl2SqlAgentV2(String question) {
-        return semanticDslAgentService.nlp2Dsl2SqlAgentV2(question);
+    public Flux<String> nlp2Dsl2SqlAgentV2(Nlp2DslAgentRequest request) {
+        return semanticDslAgentService.nlp2Dsl2SqlAgentV2(request.getQuestion());
     }
 
 }

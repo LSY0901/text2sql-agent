@@ -23,4 +23,17 @@
         ORDER BY embedding &lt;=&gt; #{vector}::vector
         LIMIT #{limit}
     </select>
+
+    <select id="selectWithNullEmbedding"
+            resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslDimension">
+        SELECT id, dimension_code, dimension_name, description
+        FROM agent.dsl_dimension
+        WHERE is_deleted = false AND embedding IS NULL
+    </select>
+
+    <update id="updateEmbedding">
+        UPDATE agent.dsl_dimension
+        SET embedding = #{vector}::public.vector
+        WHERE id = #{id}
+    </update>
 </mapper>

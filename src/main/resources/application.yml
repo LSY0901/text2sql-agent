@@ -7,7 +7,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/agent_db?options=-c%20search_path%3Dagent%2Cpublic
     username: agent_user
-    password: 12345611
+    password: 123456
   ai:
     openai:
 

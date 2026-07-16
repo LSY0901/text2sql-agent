@@ -9,7 +9,6 @@ public class DslFilter {
     private Integer id;
     private String entityCode;
     private String filterName;
-    private String filterType;
     private String expression;
     private String description;
     private Boolean isSystem;

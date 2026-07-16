@@ -17,6 +17,16 @@ public class EnrichedQueryDSL {
     private Integer limit;
 
     @Data public static class SelectColumn { private String expression; private String alias; }
-    @Data public static class EnrichedJoin { private String joinType; private String physicalTable; private String onCondition; private DslRelation sourceRelation; }
-    @Data public static class WhereColumn { private String expression; private boolean systemFilter; }
+    @Data public static class EnrichedJoin {
+        private String joinType;
+        private String physicalTable;
+        private String onCondition;
+        private DslRelation sourceRelation;
+    }
+    @Data public static class WhereColumn {
+        private String expression;
+        private boolean systemFilter;
+        /** JDBC 绑定参数，与 expression 中的 ? 一一对应 */
+        private List<Object> parameters;
+    }
 }

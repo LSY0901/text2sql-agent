@@ -17,4 +17,17 @@
         FROM agent.dsl_entity WHERE is_deleted = false AND entity_code IN
         <foreach collection="list" item="code" open="(" separator="," close=")">#{code}</foreach>
     </select>
+
+    <select id="selectWithNullEmbedding"
+            resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslEntity">
+        SELECT id, entity_code, entity_name, description
+        FROM agent.dsl_entity
+        WHERE is_deleted = false AND embedding IS NULL
+    </select>
+
+    <update id="updateEmbedding">
+        UPDATE agent.dsl_entity
+        SET embedding = #{vector}::public.vector
+        WHERE id = #{id}
+    </update>
 </mapper>
