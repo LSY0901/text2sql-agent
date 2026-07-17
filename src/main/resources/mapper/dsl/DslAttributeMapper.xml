@@ -2,12 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.firstaidemo.mapper.dsl.DslAttributeMapper">
     <select id="selectByEntityCode" resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslAttribute">
-        SELECT id, entity_code, attribute_code, attribute_name, physical_column, data_type, description,
+        SELECT id, entity_code, attribute_code, attribute_name, physical_column, data_type,
+               attribute_type, description, is_queryable, is_aggregatable,
                is_deleted, creator, created_dt, last_editor, last_edited_dt
         FROM agent.dsl_attribute WHERE entity_code = #{entityCode} AND is_deleted = false
     </select>
     <select id="selectByEntityCodes" resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslAttribute">
-        SELECT id, entity_code, attribute_code, attribute_name, physical_column, data_type, description,
+        SELECT id, entity_code, attribute_code, attribute_name, physical_column, data_type,
+               attribute_type, description, is_queryable, is_aggregatable,
                is_deleted, creator, created_dt, last_editor, last_edited_dt
         FROM agent.dsl_attribute WHERE is_deleted = false AND entity_code IN
         <foreach collection="list" item="code" open="(" separator="," close=")">#{code}</foreach>

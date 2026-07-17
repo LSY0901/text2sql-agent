@@ -1,14 +1,7 @@
 package com.example.firstaidemo.semanticdsl.retriever;
 
 import com.example.firstaidemo.semanticdsl.metadata.IDslMetaDataService;
-import com.example.firstaidemo.semanticdsl.metadata.entity.DslAttribute;
-import com.example.firstaidemo.semanticdsl.metadata.entity.DslDimension;
-import com.example.firstaidemo.semanticdsl.metadata.entity.DslDimensionValue;
-import com.example.firstaidemo.semanticdsl.metadata.entity.DslEntity;
-import com.example.firstaidemo.semanticdsl.metadata.entity.DslFilter;
-import com.example.firstaidemo.semanticdsl.metadata.entity.DslMetric;
-import com.example.firstaidemo.semanticdsl.metadata.entity.DslRelation;
-import com.example.firstaidemo.semanticdsl.metadata.entity.DslSynonym;
+import com.example.firstaidemo.semanticdsl.metadata.entity.*;
 import com.example.firstaidemo.semanticdsl.model.DslCandidate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,15 +9,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

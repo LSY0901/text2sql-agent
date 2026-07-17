@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.openai.api.ResponseFormat;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -161,10 +163,19 @@ public class SemanticDslAgentServiceImpl implements ISemanticDslAgentService {
      */
     @Override
     public IntentResult classifyIntent(String question) {
+        ResponseFormat responseFormat =
+                ResponseFormat.builder()
+                        .type(ResponseFormat.Type.JSON_SCHEMA)
+                        .jsonSchema(SemanticPromptTemplates.INTENT_JSON_SCHEMA)
+                        .build();
+
         ChatClient chatClient = ChatClient.builder(chatModel).build();
         String response = chatClient.prompt()
                 .system(SemanticPromptTemplates.INTENT_SYSTEM_PROMPT)
                 .user(question)
+                .options(OpenAiChatOptions.builder()
+                        .responseFormat(responseFormat)
+                        .build())
                 .call()
                 .content();
         try {

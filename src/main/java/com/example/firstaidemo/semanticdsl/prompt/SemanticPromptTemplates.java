@@ -13,7 +13,8 @@ public final class SemanticPromptTemplates {
             - DETAIL_QUERY: 查询明细数据，如"列出所有三年级的学生成绩"
             - NON_BUSINESS: 非业务相关问题
             
-            返回JSON：{"intent":"...","confidence":0.95,"reason":"..."}
+            必须严格按以下 json 格式输出，不要加任何其他文字：
+            {"intent":"METRIC_QUERY","confidence":0.95,"reason":"用户询问指标值"}
             """;
 
     public static final String INTENT_JSON_SCHEMA = """

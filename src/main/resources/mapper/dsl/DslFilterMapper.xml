@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.firstaidemo.mapper.dsl.DslFilterMapper">
     <select id="selectSystemFiltersByEntityCode" resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslFilter">
-        SELECT id, entity_code, filter_name, expression, description, is_system,
-               is_deleted, creator, created_dt, last_editor, last_edited_dt
+        SELECT id, filter_code, filter_name, entity_code, attribute_code, operator_type, expression,
+               description, is_system, is_deleted, creator, created_dt, last_editor, last_edited_dt
         FROM agent.dsl_filter WHERE entity_code = #{entityCode} AND is_system = true AND is_deleted = false
     </select>
     <select id="selectByEntityCode" resultType="com.example.firstaidemo.semanticdsl.metadata.entity.DslFilter">
-        SELECT id, entity_code, filter_name, expression, description, is_system,
-               is_deleted, creator, created_dt, last_editor, last_edited_dt
+        SELECT id, filter_code, filter_name, entity_code, attribute_code, operator_type, expression,
+               description, is_system, is_deleted, creator, created_dt, last_editor, last_edited_dt
         FROM agent.dsl_filter WHERE entity_code = #{entityCode} AND is_deleted = false
     </select>
 
